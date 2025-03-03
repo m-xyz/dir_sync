@@ -1,9 +1,9 @@
 import argparse
 import os
 import shutil
+import threading
 from filecmp import dircmp
 from pathlib import Path
-# TODO: Use threading to call the sync function at given interval
 
 FILE_SIZE_CHUNK = 4096
 
@@ -83,5 +83,13 @@ if __name__ == "__main__":
 
     src_path = Path(args.source).resolve()
     dst_path = Path(args.replica).resolve()
+    sync_timer = int(args.time)
 
-    sync(src_path, dst_path)
+    def synchronize_directories():
+        print(":)")
+        try:
+            sync(src_path, dst_path)
+            threading.Timer(sync_timer, synchronize_directories).start()
+        except Exception as e: print(e)
+
+    synchronize_directories()
