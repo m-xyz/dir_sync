@@ -11,6 +11,19 @@ LOG_DATE = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 FILE_SIZE_CHUNK = 4096
 
 def file_content_sync(src_file: Path, dst_file: Path):
+    """
+    Compares the contents of two files to determine if they are identical.
+    Given two files, this function compares the contents of each file by
+    reading them in chunks of FILE_SIZE_CHUNK bytes and comparing the
+    contents of each chunk. If the files are not the same size, this function
+    will return False. If the contents of the files are different, this
+    function will also return False. If the contents of the files are the same,
+    this function will return True.
+
+    :param src_file: The source file
+    :param dst_file: The destination file
+    :return: True if the contents of the files are the same, False otherwise
+    """
     if(src_file.stat().st_size != dst_file.stat().st_size): return False
 
     with src_file.open("rb") as f1, dst_file.open("rb") as f2:
@@ -24,6 +37,14 @@ def file_content_sync(src_file: Path, dst_file: Path):
     return True
 
 def sync(src, dst):
+    """
+    Syncs two directories (src and dst) by copying new files from src to dst,
+    deleting files in dst that are not in src, and updating files in dst that
+    are different from src.
+
+    :param src: source directory
+    :param dst: replica directory
+    """
     c = dircmp(src, dst)
 
     # Check files in src and not in dst, copy them to dst
@@ -105,6 +126,20 @@ if __name__ == "__main__":
     logger.addHandler(stream_handler)
 
     def synchronize_directories():
+        """
+        Continuously synchronizes two directories at regular intervals.
+
+        This function triggers the synchronization process between the source
+        and replica directories, and sets a timer to repeatedly perform this
+        operation based on the specified sync_timer interval.
+
+        Exception handling is included to log any errors encountered during
+        the synchronization process.
+
+        :raises Exception: If an error occurs during the synchronization process.
+        """
+
+        logger.info(f"Synchronizing {src_path} and {dst_path}")
         try:
             sync(src_path, dst_path)
             threading.Timer(sync_timer, synchronize_directories).start()
