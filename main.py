@@ -36,7 +36,7 @@ def file_content_sync(src_file: Path, dst_file: Path):
 
     return True
 
-def sync(src, dst):
+def sync(src: Path, dst: Path):
     """
     Syncs two directories (src and dst) by copying new files from src to dst,
     deleting files in dst that are not in src, and updating files in dst that
